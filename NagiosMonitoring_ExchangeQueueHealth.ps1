@@ -29,7 +29,6 @@ if ( (Get-PSSnapin -Name Microsoft.Exchange.Management.PowerShell.E2010 -ErrorAc
 $NagiosStatus = "0"
 
 
-#$resObj=Get-Queue -Server MAIL-01 | ForEach-Object { Write-Host -Separator ";" $_.Identity,$_.NextHopDomain,$_.MessageCount }
   
 $resultCount = Get-Queue -Server MAIL-01 | Measure-Object | Select-Object -expand Count
 [string[]]$resultHop = Get-Queue -Server MAIL-01 | Select-Object Identity,NextHopDomain,MessageCount
@@ -41,24 +40,8 @@ $NagiosPerfData = ""
 $NagiosDescription = Get-Queue -Server MAIL-01 | ForEach-Object { Write-Output -Message " "  $_.Identity " " $_.MessageCount  " msgto "  $_.NextHopDomain " "
 }
 
-for ($i=0;$i -lt $resultHop.length;$i++) 
-{
-    $tmpString = $resultHop[$i].Split(";")
-					# Format the output for Nagios
-					if ($NNagiosDescription -ne "") 
-					{
-						# we already have a message queue description, so we will add a separator
-						$NNagiosDescription = $NNagiosDescription + ", " 	
-					}
-					$NNagiosDescription = $NNagiosDescription + $tmpString[0] + " queue has " + $tmpString[1] + " messages to " + $tmpString[2]
-			
-		
-				# Look for lagged queues - warning if over 2
-}
-
-
 # Output, what level should we tell our caller?
-$NagiosPerfData = "|queue=" + $resultCount + ";10;20;0"
+$NagiosPerfData = "|queue=" + $resultCount + ";15;20;0"
 
 if ($resultCount -gt "20") 
 {
